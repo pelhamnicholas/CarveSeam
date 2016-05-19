@@ -7,12 +7,12 @@ typedef struct {
   int col;
 } tuple;
 
-inline long double min2(long double a, long double b) {
+static inline double min2(double a, double b) {
   return (a < b) ? a : b;
 }
 
-inline long double min3(long double a, long double b, long double c) {
-  long double m;
+static inline double min3(double a, double b, double c) {
+  double m;
 
   m = (a < b) ? a : b;
   return (m < c) ? m : c;
@@ -24,14 +24,12 @@ int main(int arc, char *argv[]) {
   const char delim[] = ", ";
   char * token = NULL;
   int cols, rows, i, j;
-  long double ** input_table;
-  long double ** seam_table;
+  double ** input_table;
+  double ** seam_table;
   tuple * seam;
-  long double temp_min;
+  double temp_min;
   char * output_filename;
   FILE * output_file;
-
-  printf("Input File: %s\n", argv[1]);
 
   input_file = fopen(argv[1], "r");
 
@@ -40,7 +38,7 @@ int main(int arc, char *argv[]) {
     return 1;
   }
 
-  // Get table dimensions
+  /* Get table dimensions */
   cols = 0;
   fgets(line_buf, 100000, input_file);
   token = strtok(line_buf, delim);
@@ -54,26 +52,23 @@ int main(int arc, char *argv[]) {
     rows++;
   }
 
-  printf("Rows: %d\nCols: %d\n", rows, cols);
-
-  // Create input data table
-  input_table = (long double **) malloc(sizeof(long double*) * rows);
+  /* Create input data table */
+  input_table = (double **) malloc(sizeof(double*) * rows);
   for (i = 0; i < rows; i++)
-    input_table[i] = (long double *) malloc(sizeof(long double) * cols);
+    input_table[i] = (double *) malloc(sizeof(double) * cols);
 
   rewind(input_file);
   for (i = 0; i < rows; i++) {
     fgets(line_buf, 100000, input_file);
     token = strtok(line_buf, delim);
-    input_table[i][0] = strtold(token, NULL);
+    input_table[i][0] = atof(token);
     for (j = 1; j < cols; j++) {
       token = strtok(NULL, delim);
-      input_table[i][j] = strtold(token, NULL);
+      input_table[i][j] = atof(token);
     }
   }
 
-  /*
-  // Print input table
+  /* Print input table /
   printf("\nINPUT TABLE\n");
   for (i = 0; i < rows; i++) {
     printf("%f", input_table[i][0]);
@@ -84,16 +79,16 @@ int main(int arc, char *argv[]) {
   }
   */
 
-  // Create seam data table
-  seam_table = (long double **) malloc(sizeof(long double*) * rows);
+  /* Create seam data table */
+  seam_table = (double **) malloc(sizeof(double*) * rows);
   for (i = 0; i < rows; i++)
-    seam_table[i] = (long double *) malloc(sizeof(long double) * cols);
+    seam_table[i] = (double *) malloc(sizeof(double) * cols);
 
-  // first row is just a copy
+  /* first row is just a copy */
   for (j = 0; j < cols; j++) {
     seam_table[0][j] = input_table[0][j];
   }
-  // fill in the rest of the table
+  /* fill in the rest of the table */
   for (i = 1; i < rows; i++) {
     for (j = 0; j < cols; j++) {
       if (j == 0) {
@@ -109,8 +104,7 @@ int main(int arc, char *argv[]) {
     }
   }
 
-  /*
-  // Print seam table
+  /* Print seam table /
   printf("\nSEAM TABLE\n");
   for (i = 0; i < rows; i++) {
     printf("%f", seam_table[i][0]);
@@ -121,7 +115,7 @@ int main(int arc, char *argv[]) {
   }
   */
 
-  // Find minimum seam cost in last row of seam_table
+  /* Find minimum seam cost in last row of seam_table */
   seam = (tuple *) malloc(sizeof(tuple) * rows);
   seam[0].row = rows - 1;
   seam[0].col = 0;
@@ -132,7 +126,7 @@ int main(int arc, char *argv[]) {
       seam[0].col = j;
     }
   }
-  // Traceback the minimum seam
+  /* Traceback the minimum seam */
   for (i = 1; i < rows; i++) {
     seam[i].row = rows - (i+1);
     if (seam[i-1].col == 0) {
@@ -169,18 +163,18 @@ int main(int arc, char *argv[]) {
     }
   }
 
-  // Print the minum seam
+  /* Print the minum seam */
   output_filename = (char *) malloc(sizeof(argv[1]) + 6*sizeof(char));
-  strncpy(output_filename, argv[1], (strlen(argv[1]) - 4));// - 4*sizeof(char)));
+  strncpy(output_filename, argv[1], (strlen(argv[1]) - 4));
   strcat(output_filename, "_trace.txt");
   output_file = fopen(output_filename, "w");
-  fprintf(output_file, "Min Seam: %Lf\n", seam_table[seam[0].row][seam[0].col]);
+  fprintf(output_file, "Min Seam: %f\n", seam_table[seam[0].row][seam[0].col]);
   for (i = 0; i < rows; i++) {
-    fprintf(output_file, "[%d, %d, %Lf]\n", seam[i].row, seam[i].col, 
+    fprintf(output_file, "[%d, %d, %f]\n", seam[i].row, seam[i].col, 
         input_table[seam[i].row][seam[i].col]);
   }
 
-  // Deallocate memory
+  /* Deallocate memory */
   free(output_filename);
   free(input_table);
   free(seam_table);
