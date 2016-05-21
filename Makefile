@@ -1,24 +1,12 @@
-C_FILES := $(wildcard *.c)
-OBJ_FILES := $(addprefix obj/,$(notdir $(C_FILES:.c=.o)))
-CC_FLAGS := -Wall -Werror -ansi -pedantic
+PROG := npelh001_program02
+CPP_FILES := npelh001_program02.cpp
+CC_FLAGS := -W -Wall -Werror -ansi -pedantic
+LD_LIBS := -lopencv_core -lopencv_highgui
 
-all: prog02
+all: $(PROG)
 
-prog02: $(OBJ_FILES)
-	mkdir -p bin
-	gcc -o bin/$@ $^
-
-obj/%.o: src/%.cpp
-	mkdir -p obj
-	gcc $(CC_FLAGS) -c -o $@ $<
-
-debug: $(OBJ_FILES)
-	gcc -g $(CC_FLAGS) -o $@ $^
-
-clndbg:
-	rm debug
-	rm -r obj
+$(PROG):
+	g++ $(CPP_FILES) -o $(PROG) $(LD_LIBS) $(CC_FLAGS)
 
 clean:
-	rm -r bin
-	rm -r obj
+	rm $(PROG)
