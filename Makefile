@@ -1,5 +1,5 @@
-PROG := npelh001_program02
-CPP_FILES := npelh001_program02.cpp
+PROG := carve_seam
+CPP_FILES := carve_seam.cpp
 CC_FLAGS := -W -Wall -Werror -ansi -pedantic
 LD_LIBS := -lopencv_core -lopencv_highgui
 
